@@ -9,5 +9,33 @@ module.exports = {
     contentBase: path.join(__dirname,"dist"),
     port: 9000,
     watchContentBase: true
-    }
-    }
+    },
+    module: {
+        rules: [{
+        test: /\.scss$/, //zamiana css na scss
+        use: [
+        "style-loader",
+        "css-loader",
+        "sass-loader"] //dopisanie komponentu
+        },
+        {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+        loader: 'babel-loader',
+        options: {
+        presets: ['@babel/preset-env']
+        }
+        }
+        },
+        {
+        test: /\.(png|svg|jpg|gif)$/,
+        use: {
+        loader: "file-loader",
+        options: {
+        name: "[name].[ext]"
+        }
+        }
+        },
+        ]}
+}
