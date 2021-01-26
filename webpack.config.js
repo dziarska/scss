@@ -1,3 +1,4 @@
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
 module.exports = {
     entry: "./src/index.js",
@@ -10,6 +11,11 @@ module.exports = {
     port: 9000,
     watchContentBase: true
     },
+    plugins: [
+        new HtmlWebpackPlugin({
+        template: "./src/index.html"
+        })
+        ],
     module: {
         rules: [{
         test: /\.scss$/, //zamiana css na scss
@@ -37,5 +43,9 @@ module.exports = {
         }
         }
         },
+        {
+            test: /\.(html)$/,
+            use: ["html-loader"]
+            }
         ]}
 }
