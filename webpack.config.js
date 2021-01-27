@@ -1,12 +1,39 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+const BrowserSyncPlugin = require("browser-sync-webpack-plugin");
+const autoprefixer = require("autoprefixer");
+const webpack = require("webpack");
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 module.exports = {
+    entry: { //umieszczenie w nawiasach jest ważne
+        "index": "./src/index.js",
+        },
+        output: {
+        path: path.resolve(__dirname, "dist"),
+        filename: "[name].[contenthash].bundle.js"
+        },
+        devServer: {
+        // contentBase: path.join(__dirname, "dist"),
+        port: 9000,
+        // watchContentBase: true
+        },
+        plugins: [
+        new HtmlWebpackPlugin({
+        template: "./src/index.html",
+        }),
+        new HtmlWebpackPlugin({
+        template: './src/kontakt.html',
+        inject: true,
+        chunks: ['index'],
+        filename: 'kontakt.html'
+        }),],
     entry: "./src/index.js",
     output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "bundle.js"
-    },
+    filename: "[contenthash].bundle.js"    },
     devServer:{
     contentBase: path.join(__dirname,"dist"),
     port: 9000,
@@ -16,16 +43,38 @@ module.exports = {
         new HtmlWebpackPlugin({
         template: "./src/index.html"
         }),
-        new CleanWebpackPlugin()
+        new CleanWebpackPlugin(),
+        new MiniCssExtractPlugin({
+            filename: "[name].[hash].css"
+            }),
+            new OptimizeCssAssetsPlugin({
+            assetNameRegExp: /\.css$/
+            }),
+            new BrowserSyncPlugin({
+                host: 'localhost',
+                port: 9100,
+                proxy: 'http://localhost:9000'
+                }, {
+                reload: false
+                }),
+                new webpack.LoaderOptionsPlugin({
+                    options: {
+                    postcss: [
+                    autoprefixer()
+                    ]
+                    }
+                    })
         ],
     module: {
         rules: [{
         test: /\.scss$/, //zamiana css na scss
         use: [
-        "style-loader",
-        "css-loader",
-        "sass-loader"] //dopisanie komponentu
-        },
+            // "style-loader",
+            MiniCssExtractPlugin.loader,
+            "css-loader",
+            "sass-loader",
+            "postcss-loader"]
+            },
         {
         test: /\.js$/,
         exclude: /node_modules/,
@@ -48,6 +97,7 @@ module.exports = {
         {
             test: /\.(html)$/,
             use: ["html-loader"]
-            }
+            },
+            
         ]}
 }
